@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "playereventlog",
+  "version": "${version}",
+  "name": "Player Event Log",
+  "description": "Writes the local player's state changes and movements (damage, death, healing, effects, water, lava, fire, freezing, dimension changes, walking, jumping, sneaking, swinging, mining) to logs/player-events.jsonl, one JSON object per line. Read only: no network, no gameplay changes.\nNOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT\nContact: streamhearts.contact@gmail.com",
+  "authors": ["Stream Hearts"],
+  "contact": {
+    "email": "streamhearts.contact@gmail.com"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["playereventlog.fabric.PelFabric"]
+  },
+  "mixins": ["playereventlog.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${loader_min}",
+    "minecraft": "${mc_range}",
+    "java": ">=${java_version}"
+  }
+}

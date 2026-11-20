@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="playereventlog"
+version="${mod_version}"
+displayName="Player Event Log"
+displayTest="IGNORE_ALL_VERSION"
+authors="Stream Hearts"
+description='''
+Writes the local player's state changes and movements (damage, death, healing, effects, water, lava, fire, freezing, dimension changes, walking, jumping, sneaking, swinging, mining) to logs/player-events.jsonl, one JSON object per line. Read only: no network, no gameplay changes.
+NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
+Contact: streamhearts.contact@gmail.com
+'''
+
+[[dependencies.playereventlog]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.playereventlog]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.20.2)"
+    ordering="NONE"
+    side="CLIENT"

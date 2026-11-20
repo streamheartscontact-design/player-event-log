@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "playereventlog",
+    "name": "Player Event Log",
+    "description": "Writes the local player's state changes and movements (damage, death, healing, effects, water, lava, fire, freezing, dimension changes, walking, jumping, sneaking, swinging, mining) to logs/player-events.jsonl, one JSON object per line. Read only: no network, no gameplay changes. / NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT / Contact: streamhearts.contact@gmail.com",
+    "version": "${version}",
+    "mcversion": "1.12.2",
+    "url": "",
+    "authorList": ["Stream Hearts"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

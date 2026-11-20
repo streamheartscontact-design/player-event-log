@@ -1,0 +1,54 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+}
+
+version = "${mod_version}+fabric-${minecraft_version}"
+group = 'playereventlog'
+base {
+    archivesName = 'player-event-log'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir '../core/src/main/java'
+            srcDir '../shared/mojmap/src/main/java'
+            srcDir '../shared/fabric/src/main/java'
+            srcDir "../shared/compat/${compat_dir}"
+        }
+        resources {
+            srcDir '../shared/fabric/src/main/resources'
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+}
+
+processResources {
+    def props = [version: project.version, mc_range: mc_range, java_version: java_version,
+                 loader_min: loader_min, mixin_java: mixin_java]
+    inputs.properties props
+    filesMatching(['fabric.mod.json', 'playereventlog.mixins.json']) {
+        expand(props) {
+            escapeBackslash = true
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = java_version as int
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion(java_version)
+    targetCompatibility = JavaVersion.toVersion(java_version)
+}
+
+jar {
+    from('../LICENSE')
+}

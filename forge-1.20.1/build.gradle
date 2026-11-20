@@ -1,0 +1,66 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+
+version = "${mod_version}+forge-${minecraft_version}"
+group = 'playereventlog'
+base {
+    archivesName = 'player-event-log'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+sourceSets {
+    main {
+        java {
+            srcDir '../core/src/main/java'
+            srcDir '../shared/mojmap/src/main/java'
+            srcDir '../shared/compat/mojmap-1.20.1'
+        }
+    }
+}
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    copyIdeResources = true
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+            mods {
+                playereventlog {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    filteringCharset = 'UTF-8'
+    def props = [mod_version: project.version]
+    inputs.properties props
+    filesMatching(['META-INF/mods.toml']) {
+        expand(props)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('jar', Jar).configure {
+    from('../LICENSE')
+    manifest {
+        attributes([
+            'Specification-Title'   : 'playereventlog',
+            'Implementation-Title'  : 'Player Event Log',
+            'Implementation-Version': project.version
+        ])
+    }
+    finalizedBy 'reobfJar'
+}
