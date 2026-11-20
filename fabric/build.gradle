@@ -1,0 +1,96 @@
+plugins {
+    id 'java'
+}
+
+version = "${mod_version}+fabric"
+group = 'playereventlog'
+base {
+    archivesName = 'player-event-log'
+}
+
+repositories {
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net/'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("net.fabricmc:fabric-loader:${loader_version}") { transitive = false }
+    compileOnly("net.fabricmc:sponge-mixin:${mixin_version}") { transitive = false }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir '../core/src/main/java'
+            srcDir '../shared/fabric/src/main/java'
+        }
+        resources {
+            srcDir '../shared/fabric/src/main/resources'
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 8
+    options.compilerArgs += ['-Xlint:-options']
+}
+
+processResources {
+    def props = [version: project.version]
+    inputs.properties props
+    filesMatching('fabric.mod.json') {
+        expand(props) {
+            escapeBackslash = true
+        }
+    }
+}
+
+def partVersions = ['1.16.5', '1.18.2', '1.20.1', '1.21.1', '1.21.11', '26.3']
+def partJars = partVersions.collect { file("../fabric-${it}/build/libs/pel-part-${it}.jar") }
+
+jar {
+    from('../LICENSE')
+    partJars.each { part ->
+        from(zipTree(part)) {
+            include 'playereventlog/mc/v*/**'
+        }
+    }
+    inputs.files(partJars)
+    doFirst {
+        partJars.each { if (!it.isFile()) throw new GradleException("missing ${it}: build the fabric-<version> folders first") }
+    }
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation("net.fabricmc:fabric-loader:${loader_version}") { transitive = false }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'failed'
+        exceptionFormat 'full'
+    }
+}
+
+def checkReaders = tasks.register('checkReaders') {
+    def built = jar.archiveFile
+    def want = partVersions.collect { 'v' + it.replace('.', '_') }
+    inputs.file(built)
+    doLast {
+        def names = new java.util.zip.ZipFile(built.get().asFile).withCloseable { z ->
+            z.entries().toList().collect { it.name }.findAll { it ==~ /playereventlog\/mc\/v[^\/]+\/Reader\.class/ }
+                    .collect { it.split('/')[2] }
+        }
+        if (!names.containsAll(want)) throw new GradleException("readers missing in the jar: ${want - names}")
+    }
+}
+jar.finalizedBy checkReaders
+tasks.named('build') { dependsOn checkReaders }

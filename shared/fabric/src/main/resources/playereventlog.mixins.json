@@ -1,12 +1,12 @@
 {
-  "required": true,
+  "required": false,
   "minVersion": "0.8",
   "package": "playereventlog.fabric.mixin",
-  "compatibilityLevel": "${mixin_java}",
+  "compatibilityLevel": "JAVA_8",
   "client": [
     "MinecraftMixin"
   ],
   "injectors": {
-    "defaultRequire": 1
+    "defaultRequire": 0
   }
 }

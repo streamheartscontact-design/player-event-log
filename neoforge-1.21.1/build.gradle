@@ -1,0 +1,42 @@
+plugins {
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = "${mod_version}+neoforge-${minecraft_version}"
+group = 'playereventlog'
+base {
+    archivesName = 'player-event-log'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+sourceSets {
+    main {
+        java {
+            srcDir '../core/src/main/java'
+            srcDir '../shared/mojmap/src/main/java'
+            srcDir '../shared/compat/mojmap-1.21.1'
+        }
+    }
+}
+
+neoForge {
+    version = neo_version
+}
+
+processResources {
+    filteringCharset = 'UTF-8'
+    def props = [mod_version: project.version]
+    inputs.properties props
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand(props)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    from('../LICENSE')
+}

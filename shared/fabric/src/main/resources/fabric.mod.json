@@ -15,8 +15,8 @@
   },
   "mixins": ["playereventlog.mixins.json"],
   "depends": {
-    "fabricloader": ">=${loader_min}",
-    "minecraft": "${mc_range}",
-    "java": ">=${java_version}"
+    "fabricloader": ">=0.14.0",
+    "minecraft": "*",
+    "java": ">=8"
   }
 }

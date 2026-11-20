@@ -4,7 +4,7 @@ A free, open-source client-side mod for Minecraft: Java Edition. It records what
 
 - Read only. The mod observes the client and never changes gameplay. It gives no in-game advantage.
 - Writes one local file. No network code, no open ports, no telemetry.
-- Works in singleplayer and on servers (for your own player). Nothing needs to be installed on the server.
+- Works in singleplayer and on servers (for your own player). Client only: nothing needs to be installed on the server, and you can join servers without this mod or with other mods (no network channels; the Forge and NeoForge builds are marked so the server's mod check ignores them). If a server's rules forbid client mods, follow those rules.
 - The format is open and documented below, so anyone can write a program that reads the file (stream overlays, statistics, notifications, accessibility tools and so on).
 - No payments, purchase checks, paid unlocks or play-to-earn rewards. Not tied to any particular program. Contains no Mojang textures, sounds or code.
 
@@ -15,27 +15,25 @@ Contact: streamhearts.contact@gmail.com
 
 ## 한국어 요약
 
-마인크래프트 자바 에디션용 무료·오픈소스 클라이언트 모드입니다. 내 플레이어의 상태 변화와 움직임(피격·사망·회복·효과·물·용암·불·얼어붙음·차원 이동·걷기·점프·웅크리기·휘두르기·블록 캐기)을 게임 폴더의 `logs/player-events.jsonl`에 한 줄에 JSON 하나씩 기록합니다. 게임을 바꾸지 않고 읽기만 하며, 네트워크를 쓰지 않고 게임 속 이득도 없습니다. 형식은 아래에 공개되어 있어 누구나 이 파일을 읽는 프로그램을 만들 수 있습니다. 문의: streamhearts.contact@gmail.com
+마인크래프트 자바 에디션용 무료·오픈소스 클라이언트 모드입니다(서버에 설치할 필요 없음, 서버 규칙이 클라이언트 모드를 금지하면 따를 것). 내 플레이어의 상태 변화와 움직임(피격·사망·회복·효과·물·용암·불·얼어붙음·차원 이동·걷기·점프·웅크리기·휘두르기·블록 캐기)을 게임 폴더의 `logs/player-events.jsonl`에 한 줄에 JSON 하나씩 기록합니다. 게임을 바꾸지 않고 읽기만 하며, 네트워크를 쓰지 않고 게임 속 이득도 없습니다. 형식은 아래에 공개되어 있어 누구나 이 파일을 읽는 프로그램을 만들 수 있습니다. 문의: streamhearts.contact@gmail.com
 
 ## Supported versions
 
 | Loader | Minecraft | Java | Jar |
 |---|---|---|---|
-| Fabric | 1.16.5 | 8 | `player-event-log-1.3.0+fabric-1.16.5.jar` |
-| Fabric | 1.18.2 | 17 | `player-event-log-1.3.0+fabric-1.18.2.jar` |
-| Fabric | 1.20, 1.20.1 | 17 | `player-event-log-1.3.0+fabric-1.20.1.jar` |
-| Fabric | 1.21, 1.21.1 | 21 | `player-event-log-1.3.0+fabric-1.21.1.jar` |
-| Fabric | 1.21.11 | 21 | `player-event-log-1.3.0+fabric-1.21.11.jar` |
-| Fabric | 26.3 | 25 | `player-event-log-1.3.0+fabric-26.3.jar` |
-| Forge | 1.12.2 | 8 | `player-event-log-1.3.0+forge-1.12.2.jar` |
-| Forge | 1.20.1 | 17 | `player-event-log-1.3.0+forge-1.20.1.jar` |
+| Fabric | 1.16.5, 1.18.2, 1.20, 1.20.1, 1.21, 1.21.1, 1.21.11, 26.3 | whatever that version uses (8 / 17 / 21 / 25) | `player-event-log-1.4.0+fabric.jar` (one file) |
+| Forge | 1.12.2 | 8 | `player-event-log-1.4.0+forge-1.12.2.jar` |
+| Forge | 1.20.1 | 17 | `player-event-log-1.4.0+forge-1.20.1.jar` |
+| NeoForge | 1.21.1 | 21 | `player-event-log-1.4.0+neoforge-1.21.1.jar` |
 
-The Fabric builds only need Fabric Loader (Fabric API is not required).
+Other loader and version combinations are not supported.
+
+One Fabric jar works on every Fabric version above, so several game versions can share one `mods` folder. It only needs Fabric Loader 0.14.0 or newer (Fabric API is not required). On a Fabric version that is not listed, the game starts normally and the log shows one line, `[PlayerEventLog] Minecraft <version> is not supported by this version: nothing is recorded`.
 
 ## Installation
 
-1. Pick the jar for your loader and Minecraft version from the release.
-2. Put it in the `mods` folder of your game directory and start the game.
+1. Fabric: take `player-event-log-1.4.0+fabric.jar`. Forge or NeoForge: take the jar for your Minecraft version.
+2. Put it in the `mods` folder of your game directory and start the game. Remove older per-version Fabric jars (`...+fabric-1.20.1.jar` and so on) if you have them.
 3. After you join a world, `logs/player-events.jsonl` appears in the game directory.
 
 ## Privacy
@@ -59,7 +57,7 @@ The Fabric builds only need Fabric Loader (Fabric API is not required).
 | `v` | integer | Format version, currently `1`. Raised only when the meaning of an existing field changes. New events and fields keep `1`. |
 | `t` | string | Time of the line, ISO 8601 with offset (`2026-11-20T17:01:27.512+09:00`) |
 | `mc` | string | Minecraft version (`1.20.1`, `26.3`, ...) |
-| `loader` | string | `fabric` or `forge` |
+| `loader` | string | `fabric`, `forge` or `neoforge` |
 | `event` | string | Event name (tables below) |
 | `kind` | string | `state` = a line with current values, `event` = something that just happened |
 
@@ -187,7 +185,7 @@ How causes are found
 | Sweet berry bush | 1.12.2 | not used as an estimated cause |
 | Infinite effects | before 1.19.4 | `infinite` is always `false` |
 
-Movement lines (`move_*`, `jump`, `swing`, `mine_*`, `sneak_*`) and `moving`, `sneaking`, `on_ground` work the same in all eight builds.
+Movement lines (`move_*`, `jump`, `swing`, `mine_*`, `sneak_*`) and `moving`, `sneaking`, `on_ground` work the same on every supported version.
 
 ## Configuration (`config/player-events.json`)
 
@@ -231,9 +229,11 @@ Every folder is a separate Gradle project with its own Gradle Wrapper. Install t
 | Folder | JDK that runs Gradle | Command |
 |---|---|---|
 | `core` | 17 or newer | `gradlew test` (unit tests) |
-| `fabric-*` | 25 | `gradlew build` -> `build/libs/` |
+| `fabric-<ver>` (6 folders) | 25 | `gradlew build` -> `build/libs/pel-part-<ver>.jar` (the reader for that version) |
+| `fabric` | 17 or newer | `gradlew build` -> `build/libs/player-event-log-<version>+fabric.jar` (build the six parts first) |
 | `forge-1.20.1` | 17 | `gradlew build` |
 | `forge-1.12.2` | 8 | `gradlew build` |
+| `neoforge-1.21.1` | 21 | `gradlew build` |
 
 To build everything at once, give the script the four JDK folders (or set `JAVA8_HOME`, `JAVA17_HOME`, `JAVA21_HOME` and `JAVA25_HOME`). The jars and `SHA256SUMS.txt` are collected in `dist/`.
 
@@ -249,12 +249,14 @@ Source layout
 
 ```
 core/                 version independent part: format, JSON, state diffing, file writer, cause mapping, unit tests
-shared/mojmap/        player reader with Mojang names (all Fabric builds and Forge 1.20.1)
+shared/mojmap/        player reader with Mojang names (all Fabric versions and Forge 1.20.1)
 shared/compat/<ver>/  the few calls whose names differ per Minecraft version
-shared/fabric/        Fabric entry point and tick hook (reads at the end of the client tick)
-fabric-<ver>/         build settings per Fabric version
+shared/fabric/        Fabric entry point (loads the running version's reader by name) and the tick hook (one mixin for all versions)
+fabric-<ver>/         the reader for one Minecraft version, compiled with that version's mappings and Java, in package playereventlog.mc.v<ver>
+fabric/               joins the common part (Java 8) and the six readers into the one Fabric jar
 forge-1.20.1/         Forge 1.20.1 entry point and build settings
 forge-1.12.2/         Forge 1.12.2 entry point, reader and build settings
+neoforge-1.21.1/      NeoForge 1.21.1 entry point and build settings (same reader as Fabric 1.21.1)
 ```
 
 ## License

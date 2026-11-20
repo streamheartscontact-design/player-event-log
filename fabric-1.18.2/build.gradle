@@ -2,22 +2,27 @@ plugins {
     id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 }
 
-version = "${mod_version}+fabric-${minecraft_version}"
+version = minecraft_version
 group = 'playereventlog'
 base {
-    archivesName = 'player-event-log'
+    archivesName = 'pel-part'
+}
+
+def partPackage = 'v' + minecraft_version.replace('.', '_')
+def partSrc = layout.buildDirectory.dir('generated/part-src')
+
+tasks.register('partSources', Sync) {
+    from('../shared/mojmap/src/main/java/playereventlog/mc')
+    from("../shared/compat/${compat_dir}/playereventlog/mc")
+    into(partSrc.map { it.dir("playereventlog/mc/${partPackage}") })
+    filter { String line -> line.replace('package playereventlog.mc;', "package playereventlog.mc.${partPackage};") }
 }
 
 sourceSets {
     main {
         java {
             srcDir '../core/src/main/java'
-            srcDir '../shared/mojmap/src/main/java'
-            srcDir '../shared/fabric/src/main/java'
-            srcDir "../shared/compat/${compat_dir}"
-        }
-        resources {
-            srcDir '../shared/fabric/src/main/resources'
+            srcDir(files(partSrc).builtBy('partSources'))
         }
     }
 }
@@ -28,17 +33,6 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 }
 
-processResources {
-    def props = [version: project.version, mc_range: mc_range, java_version: java_version,
-                 loader_min: loader_min, mixin_java: mixin_java]
-    inputs.properties props
-    filesMatching(['fabric.mod.json', 'playereventlog.mixins.json']) {
-        expand(props) {
-            escapeBackslash = true
-        }
-    }
-}
-
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = java_version as int
@@ -47,8 +41,4 @@ tasks.withType(JavaCompile).configureEach {
 java {
     sourceCompatibility = JavaVersion.toVersion(java_version)
     targetCompatibility = JavaVersion.toVersion(java_version)
-}
-
-jar {
-    from('../LICENSE')
 }

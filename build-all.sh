@@ -9,6 +9,7 @@ run() {
     dir=$1
     jdk=$2
     task=$3
+    copy=$4
     if [ -z "$jdk" ]; then
         status="$status
 $dir SKIPPED (JDK missing)"
@@ -18,7 +19,7 @@ $dir SKIPPED (JDK missing)"
     if (cd "$root/$dir" && JAVA_HOME="$jdk" sh ./gradlew "$task" --console=plain); then
         status="$status
 $dir OK"
-        if [ "$task" = build ]; then
+        if [ "$copy" = copy ]; then
             ver=$(sed -n 's/^mod_version=//p' "$root/$dir/gradle.properties" | tr -d '\r')
             for f in "$root/$dir/build/libs/player-event-log-$ver+"*.jar; do
                 case "$f" in
@@ -33,12 +34,14 @@ $dir FAILED"
     fi
 }
 
-run core "${JAVA21_HOME:-}" test
+run core "${JAVA21_HOME:-}" test no
 for v in 1.16.5 1.18.2 1.20.1 1.21.1 1.21.11 26.3; do
-    run "fabric-$v" "${JAVA25_HOME:-}" build
+    run "fabric-$v" "${JAVA25_HOME:-}" build no
 done
-run forge-1.20.1 "${JAVA17_HOME:-}" build
-run forge-1.12.2 "${JAVA8_HOME:-}" build
+run fabric "${JAVA21_HOME:-}" build copy
+run forge-1.20.1 "${JAVA17_HOME:-}" build copy
+run forge-1.12.2 "${JAVA8_HOME:-}" build copy
+run neoforge-1.21.1 "${JAVA21_HOME:-}" build copy
 
 echo "$status"
 (cd "$dist" && sha256sum player-event-log-*.jar > SHA256SUMS.txt)

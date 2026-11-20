@@ -9,15 +9,17 @@ $ErrorActionPreference = 'Continue'
 $root = $PSScriptRoot
 $jdks = @{ 8 = $Jdk8; 17 = $Jdk17; 21 = $Jdk21; 25 = $Jdk25 }
 $projects = @(
-    @{ Dir = 'core';           Jdk = 21; Task = 'test' },
-    @{ Dir = 'fabric-1.16.5';  Jdk = 25; Task = 'build' },
-    @{ Dir = 'fabric-1.18.2';  Jdk = 25; Task = 'build' },
-    @{ Dir = 'fabric-1.20.1';  Jdk = 25; Task = 'build' },
-    @{ Dir = 'fabric-1.21.1';  Jdk = 25; Task = 'build' },
-    @{ Dir = 'fabric-1.21.11'; Jdk = 25; Task = 'build' },
-    @{ Dir = 'fabric-26.3';    Jdk = 25; Task = 'build' },
-    @{ Dir = 'forge-1.20.1';   Jdk = 17; Task = 'build' },
-    @{ Dir = 'forge-1.12.2';   Jdk = 8;  Task = 'build' }
+    @{ Dir = 'core';           Jdk = 21; Task = 'test';  Copy = $false },
+    @{ Dir = 'fabric-1.16.5';  Jdk = 25; Task = 'build'; Copy = $false },
+    @{ Dir = 'fabric-1.18.2';  Jdk = 25; Task = 'build'; Copy = $false },
+    @{ Dir = 'fabric-1.20.1';  Jdk = 25; Task = 'build'; Copy = $false },
+    @{ Dir = 'fabric-1.21.1';  Jdk = 25; Task = 'build'; Copy = $false },
+    @{ Dir = 'fabric-1.21.11'; Jdk = 25; Task = 'build'; Copy = $false },
+    @{ Dir = 'fabric-26.3';    Jdk = 25; Task = 'build'; Copy = $false },
+    @{ Dir = 'fabric';         Jdk = 21; Task = 'build'; Copy = $true },
+    @{ Dir = 'forge-1.20.1';   Jdk = 17; Task = 'build'; Copy = $true },
+    @{ Dir = 'forge-1.12.2';   Jdk = 8;  Task = 'build'; Copy = $true },
+    @{ Dir = 'neoforge-1.21.1'; Jdk = 21; Task = 'build'; Copy = $true }
 )
 $wrapper = if ($IsWindows -or $env:OS -eq 'Windows_NT') { '.\gradlew.bat' } else { './gradlew' }
 $dist = Join-Path $root 'dist'
@@ -41,7 +43,7 @@ foreach ($p in $projects) {
     } finally {
         Pop-Location
     }
-    if ($ok -and $p.Task -eq 'build') {
+    if ($ok -and $p.Copy) {
         $ver = (Select-String -Path (Join-Path $dir 'gradle.properties') -Pattern '^mod_version=(.+)$').Matches[0].Groups[1].Value.Trim()
         Get-ChildItem (Join-Path $dir 'build/libs') -Filter "player-event-log-$ver+*.jar" |
             Where-Object { $_.Name -notmatch '-(sources|dev|slim)\.jar$' } |
